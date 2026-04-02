@@ -3,7 +3,7 @@ name: Enviar señales diarias de rotación sectorial
 on:
   schedule:
     # Ejecutar todos los días a las 20:00 UTC (16:00 ET, después del cierre)
-    - cron: '0 20 * * *'
+    - cron: '5 21 * * 1,3,5'
   workflow_dispatch:  # Permite ejecutar manualmente desde GitHub
 
 jobs:
