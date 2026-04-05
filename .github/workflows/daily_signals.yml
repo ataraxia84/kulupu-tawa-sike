@@ -1,48 +1,49 @@
-name: Enviar señales diarias de rotación sectorial
+# .github/workflows/sector_rotation.yml
+name: Sector Rotation Bot
 
 on:
   schedule:
-    # Ejecutar todos los días a las 20:00 UTC (16:00 ET, después del cierre)
-    - cron: '5 21 * * 1,3,5'
-  workflow_dispatch:  # Permite ejecutar manualmente desde GitHub
+    # Lunes a viernes, 30 min después del cierre de NYSE (datos completos)
+    - cron: "30 21 * * 1-5"
+  workflow_dispatch:  # Ejecución manual
 
 jobs:
-  send-signals:
+  analyze:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout código
-      uses: actions/checkout@v4
-    
-    - name: Configurar Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-    
-    - name: Instalar dependencias
-      run: |
-        pip install -r requirements.txt
-    
-    - name: Ejecutar bot de Telegram
-      env:
-        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      run: |
-        python telegram_bot.py
-    
-    - name: Subir caché como artefacto
-      uses: actions/upload-artifact@v4
-      with:
-        name: score-cache
-        path: .score_cache.json
-        retention-days: 7
-        # Opcional: compresión para mejorar velocidad
-        compression-level: 6
-    
-    - name: Guardar caché para próxima ejecución
-      uses: actions/cache@v4
-      with:
-        path: .score_cache.json
-        key: score-cache-${{ github.run_id }}
-        restore-keys: |
-          score-cache-
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Cache Python packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      
+      - name: Cache sector data (persiste entre runs)
+        uses: actions/cache@v3
+        with:
+          path: .sector_cache.json
+          key: sector-cache-${{ github.run_id }}
+          restore-keys: |
+            sector-cache-
+      
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install yfinance pandas numpy requests
+      
+      - name: Run sector rotation bot
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          DEBUG: ${{ vars.DEBUG }}
+        run: python telegram_bot.py
