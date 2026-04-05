@@ -32,6 +32,11 @@ SECTORS = {
     "XLU": "Utilities",
     "XLRE": "Real Estate",
     "XLB": "Materials",
+    "SMH": "Semiconductors",      # Leading indicator para tecnología
+    "ITA": "Aerospace & Defense", # Geopolítico / defensivo
+    "IBB": "Biotechnology",       # Alta beta dentro de Health Care
+    "KRE": "Regional Banks",      # Diferente comportamiento que XLF
+    "XHB": "Homebuilders",        # Cíclico temprano
 }
 
 BENCHMARK = "SPY"
