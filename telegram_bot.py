@@ -35,6 +35,7 @@ SECTORS = {
     "ITA": "Aerospace & Defense", # Geopolítico / defensivo
     "IBB": "Biotechnology",       # Alta beta dentro de Health Care
     "XHB": "Homebuilders",        # Cíclico temprano
+    "FDIG": "Crypto Industry",
 }
 
 BENCHMARK = "SPY"
