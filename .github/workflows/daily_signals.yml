@@ -2,9 +2,8 @@
 name: Sector Rotation Bot
 
 on:
-  schedule:
-    # Lunes a viernes, 30 min después del cierre de NYSE (datos completos)
-    - cron: "30 21 * * 1-5"
+  # schedule:
+  #   - cron: "30 21 * * 1-5"
   workflow_dispatch:  # Ejecución manual
 
 jobs:
