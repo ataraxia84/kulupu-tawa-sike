@@ -415,16 +415,33 @@ def format_message(sectors_data, changes):
     return "\n".join(lines)
 
 def format_sector_detail(s, detailed=False):
-    """Formatea una línea detallada de sector"""
+    """Formatea una línea detallada de sector (con manejo de None)"""
     signal = s["signal"]["signal"].upper()
     emoji = "🟢" if signal == "READY" else "🟡" if signal == "WATCH" else "⚪"
     
-    # Indicadores de condición
-    rsi_ok = s["rsi"] is not None and 40 <= s["rsi"] <= 65
-    rsi_icon = "✅" if rsi_ok else "❌"
+    # Safe handling for None values
+    ticker = s['ticker'] if s['ticker'] is not None else "N/A"
+    name = s['name'] if s['name'] is not None else "Unknown"
+    name_short = name[:12] if name else ""
     
-    sma_ok = s["dist_sma20"] is not None and s["dist_sma20"] <= 12
-    sma_icon = "✅" if sma_ok else "❌"
+    # Safe score formatting
+    score_str = f"{s['score']:.0f}" if s['score'] is not None else "N/A"
+    
+    # Safe RSI formatting
+    if s['rsi'] is not None:
+        rsi_ok = 40 <= s['rsi'] <= 65
+        rsi_icon = "✅" if rsi_ok else "❌"
+        rsi_str = f"{s['rsi']:.0f}{rsi_icon}"
+    else:
+        rsi_str = "N/A❓"
+    
+    # Safe SMA20 formatting
+    if s['dist_sma20'] is not None:
+        sma_ok = s['dist_sma20'] <= 12
+        sma_icon = "✅" if sma_ok else "❌"
+        sma_str = f"{s['dist_sma20']:.1f}%{sma_icon}"
+    else:
+        sma_str = "N/A❓"
     
     # Cuadrante icono
     quad_icon = {
@@ -435,15 +452,16 @@ def format_sector_detail(s, detailed=False):
     }.get(s["quadrant"], "⚪")
     
     if detailed:
-        return (f"{emoji} *{s['ticker']}* {s['name'][:12]} | "
-                f"Score: {s['score']:.0f} | {quad_icon} {s['quadrant']} | "
-                f"RS: {s['rs']:.0f} | Mom: {s['mom']:.0f}")
+        rs_str = f"{s['rs']:.0f}" if s['rs'] is not None else "N/A"
+        mom_str = f"{s['mom']:.0f}" if s['mom'] is not None else "N/A"
+        return (f"{emoji} *{ticker}* {name_short} | "
+                f"Score: {score_str} | {quad_icon} {s['quadrant']} | "
+                f"RS: {rs_str} | Mom: {mom_str}")
     else:
-        return (f"{emoji} *{s['ticker']}* {s['name'][:12]} | "
-                f"Score: {s['score']:.0f} | "
-                f"RSI: {s['rsi']:.0f}{rsi_icon} | "
-                f"SMA20: {s['dist_sma20']:.1f}%{sma_icon}")
-
+        return (f"{emoji} *{ticker}* {name_short} | "
+                f"Score: {score_str} | "
+                f"RSI: {rsi_str} | "
+                f"SMA20: {sma_str}")
 def send_telegram_message(message):
     """Envía mensaje a Telegram"""
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
