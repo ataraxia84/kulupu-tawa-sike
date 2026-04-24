@@ -2,8 +2,8 @@
 name: Sector Rotation Bot
 
 on:
-  schedule:
-    - cron: "30 21 * * 1-5"
+  # schedule:
+  #   - cron: "30 21 * * 1-5"
   workflow_dispatch:  # Ejecución manual
 
 jobs:
